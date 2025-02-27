@@ -70,7 +70,7 @@ function App() {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p>© 2025 Calculus Visualization</p>
             <div className="flex items-center mt-4 md:mt-0">
-              <a href="https://github.com" className="text-white hover:text-blue-300 flex items-center" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/bniladridas/calculus_visualization" className="text-white hover:text-blue-300 flex items-center" target="_blank" rel="noopener noreferrer">
                 <Github size={20} className="mr-2" />
                 <span>View on GitHub</span>
               </a>
