@@ -9,10 +9,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
   const [bio, setBio] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [isProfileHovering, setIsProfileHovering] = useState(false);
   const [activeTab, setActiveTab] = useState<'student' | 'teacher' | 'enthusiast'>('student');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const controls = useAnimation();
-  
+
   // Load bio from cache on component mount
   useEffect(() => {
     const cachedBio = localStorage.getItem('userBio');
@@ -20,7 +21,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
       setBio(cachedBio);
       setSubmitted(true);
     }
-    
+
     // Start animations
     controls.start({
       opacity: 1,
@@ -29,12 +30,27 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
     });
   }, [controls]);
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    localStorage.setItem('userBio', bio);
-    setSubmitted(true);
+    setIsSubmitting(true);
+
+    // Simulate a short delay for the animation to complete
+    setTimeout(() => {
+      setIsSubmitting(false);
+      setIsSuccess(true);
+
+      // Show success state briefly before completing
+      setTimeout(() => {
+        localStorage.setItem('userBio', bio);
+        setSubmitted(true);
+        setIsSuccess(false);
+      }, 1000);
+    }, 800);
   };
-  
+
   const focusTextarea = () => {
     setSubmitted(false);
     setTimeout(() => {
@@ -71,23 +87,23 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
           transition={{ duration: 2, delay: shape.id * 0.3 }}
         />
       ))}
-      
+
       {/* Subtle grid overlay */}
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-      
+
       {/* Animated gradient blobs */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden">
         <div className="absolute top-0 left-0 w-[300px] h-[300px] bg-gradient-to-r from-indigo-200 to-sky-200 rounded-full filter blur-[100px] opacity-30 animate-move-1"></div>
         <div className="absolute bottom-0 right-0 w-[400px] h-[400px] bg-gradient-to-r from-sky-200 to-emerald-200 rounded-full filter blur-[120px] opacity-30 animate-move-2"></div>
       </div>
-      
-      <motion.div 
+
+      <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={controls}
         className="container mx-auto px-4 py-20 text-center relative z-10"
       >
         <div className="max-w-4xl mx-auto">
-          <motion.div 
+          <motion.div
             className="inline-block mb-8"
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
@@ -98,8 +114,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
               <span className="text-sm text-sky-900">Interactive Learning Platform</span>
             </div>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             className="text-5xl md:text-7xl font-bold mb-6 font-serif"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -109,8 +125,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
               Visual Calculus Explorer
             </span>
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             className="text-xl md:text-2xl mb-12 max-w-2xl mx-auto text-gray-600"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -118,9 +134,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
           >
             Transform abstract concepts into intuitive visual experiences with our interactive learning tools
           </motion.p>
-          
+
           {/* User type selector */}
-          <motion.div 
+          <motion.div
             className="max-w-md mx-auto mb-8"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -131,7 +147,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
                 <button
                   key={role}
                   className={`px-4 py-2 text-sm font-medium rounded-lg capitalize transition-all ${
-                    activeTab === role 
+                    activeTab === role
                       ? 'bg-sky-500 text-white shadow-md'
                       : 'text-gray-600 hover:text-gray-900'
                   }`}
@@ -142,7 +158,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
               ))}
             </div>
           </motion.div>
-          
+
           {/* Bio section */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -152,7 +168,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
           >
             <AnimatePresence mode="wait">
               {!submitted ? (
-                <motion.form 
+                <motion.form
                   onSubmit={handleSubmit}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -173,27 +189,103 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
                         required
                       />
                     </div>
-                    
+
                     <motion.button
                       type="submit"
                       className="relative overflow-hidden group"
-                      whileHover={{ scale: 1.02 }}
+                      whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.98 }}
+                      onMouseEnter={() => setIsProfileHovering(true)}
+                      onMouseLeave={() => setIsProfileHovering(false)}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-sky-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                      <div className="relative bg-white/70 group-hover:bg-transparent px-8 py-3 rounded-full font-medium text-gray-900 group-hover:text-white transition-all">
-                        <span className="relative z-10 flex items-center justify-center gap-2">
-                          Save Profile
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-                          </svg>
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-sky-600 rounded-full"
+                        animate={{
+                          boxShadow: isProfileHovering ? '0 0 15px 2px rgba(99, 102, 241, 0.4)' : '0 0 0px 0px rgba(99, 102, 241, 0)'
+                        }}
+                        transition={{ duration: 0.3 }}
+                      ></motion.div>
+                      <div className="relative px-8 py-3 rounded-full font-medium text-white transition-all duration-300">
+                        <span className="relative z-10 flex items-center justify-center gap-3">
+                          <AnimatePresence mode="wait">
+                            {isSubmitting ? (
+                              <motion.span
+                                key="submitting"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex items-center gap-2"
+                              >
+                                <motion.span
+                                  animate={{ rotate: 360 }}
+                                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                >
+                                  <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                  </svg>
+                                </motion.span>
+                                <span>Saving...</span>
+                              </motion.span>
+                            ) : isSuccess ? (
+                              <motion.span
+                                key="success"
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex items-center gap-2"
+                              >
+                                <motion.span
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: [0, 1.5, 1] }}
+                                  transition={{ duration: 0.5, times: [0, 0.6, 1] }}
+                                  className="text-green-300"
+                                >
+                                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                  </svg>
+                                </motion.span>
+                                <span>Saved!</span>
+                              </motion.span>
+                            ) : (
+                              <motion.span
+                                key="default"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex items-center gap-3"
+                              >
+                                <span>Save Profile</span>
+                                <motion.span
+                                  animate={{
+                                    scale: isProfileHovering ? 1.2 : 1,
+                                    y: isProfileHovering ? -2 : 0,
+                                    rotate: isProfileHovering ? [0, -10, 10, 0] : 0
+                                  }}
+                                  transition={{
+                                    duration: 0.3,
+                                    rotate: {
+                                      duration: 0.5,
+                                      ease: "easeInOut",
+                                      times: [0, 0.2, 0.4, 0.6],
+                                      repeat: isProfileHovering ? 0 : 0
+                                    }
+                                  }}
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                                  </svg>
+                                </motion.span>
+                              </motion.span>
+                            )}
+                          </AnimatePresence>
                         </span>
                       </div>
                     </motion.button>
                   </div>
                 </motion.form>
               ) : (
-                <motion.div 
+                <motion.div
                   key="bio-display"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -220,9 +312,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
               )}
             </AnimatePresence>
           </motion.div>
-          
+
           {/* CTA Button */}
-          <motion.div 
+          <motion.div
             className="flex gap-4 justify-center mt-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -236,7 +328,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full"></div>
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-sky-500 to-indigo-500 rounded-full"
+                animate={{
+                  boxShadow: isHovering ? '0 0 15px 2px rgba(56, 189, 248, 0.4)' : '0 0 0px 0px rgba(56, 189, 248, 0)'
+                }}
+                transition={{ duration: 0.3 }}
+              ></motion.div>
               <div className="relative px-8 py-4 rounded-full font-semibold text-white transition-all duration-300">
                 <span className="relative z-10 flex items-center gap-3">
                   <span>Launch Interactive Demo</span>
@@ -252,9 +350,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
               </div>
             </motion.button>
           </motion.div>
-          
+
           {/* Features preview */}
-          <motion.div 
+          <motion.div
             className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -264,7 +362,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ setShowDemo }) => {
           </motion.div>
         </div>
       </motion.div>
-      
+
       {/* Floating particles */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {[...Array(20)].map((_, i) => (
